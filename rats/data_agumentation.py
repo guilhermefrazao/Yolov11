@@ -12,12 +12,24 @@ def save_images(batch, batch_idx):
         img_array = img.numpy().astype("uint8")
         
         # Usar o índice do batch e da imagem para nomear o arquivo
-        img_filename = f"{output_dir}/augmented_image_{batch_idx}_{i}.png"
+        img_filename = f"../{augmentation_dir}/augmented_image_{batch_idx}_{i}.png"
         
         # Salvar a imagem usando Matplotlib
         plt.imsave(img_filename, img_array)
 
-ds = preprocessing.image_dataset_from_directory(directory="datasets/train", image_size=(640, 480), batch_size=32, verbose=True)
+def save_labels(labels, batch_idx):
+    for i, label in enumerate(labels):
+
+        label_array = label.numpy().astype("float32")
+
+        label_filename = f"../{labels_dir}/augmented_image_{batch_idx}_{i}.txt"
+
+        files = "../datasets/train/labels_augmentation"
+
+        with open(files, 'w') as file:
+            file.writelines(f"{label_array[0]} {label_array[1]} {label_array[2]} {label_array[3]} {label_array[4]}")
+
+ds = preprocessing.image_dataset_from_directory(directory="../datasets/train", image_size=(640, 480), batch_size=32, verbose=True)
 
 augmentation_pipeline = layers.Pipeline([
     layers.AutoContrast(),
@@ -33,10 +45,14 @@ preprocessed_ds = ds.map(
     num_parallel_calls=tf.data.experimental.AUTOTUNE,
 )
 
-output_dir = "datasets/train/images_augmentation"
+augmentation_dir = "datasets/train/images_augmentation"
+labels_dir = "datasets/train/labels_augmentation"
+
 
 # Iterar sobre o dataset processado e salvar as imagens aumentadas
 for batch_idx, (batch_images, batch_labels) in enumerate(preprocessed_ds):
     save_images(batch_images, batch_idx)
+    save_labels(batch_labels, batch_idx)
 
-print(f"Imagens processadas foram salvas no diretório: {output_dir}")
+print(f"Imagens processadas foram salvas no diretório: {augmentation_dir}")
+print(f"Labels processadas foram salvas no diretório: {labels_dir}")
