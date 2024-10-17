@@ -2,8 +2,8 @@ import cv2
 
 img_height = 480
 img_width = 640
-path = 'dataset/train/labels/1_jpg.rf.4890e34a48eedb5eb9ed1139f5a81e04.txt'
-path_img = 'datasets/train/images_augmentation/augmented_image_0_0.png'
+path = 'datasets/train/labels_augmentation/augmented_image_0_0.txt'
+path_img = 'datasets/train/images_augmentation/augmented_image_0_3.png'
 
 with open(path,'r') as file:
     line = file.readlines()
