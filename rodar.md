@@ -1,0 +1,2 @@
+Yolov_8 model comand run train: 
+yolo task=detect  mode=train  model=ultralytics\cfg\models\v8\yolov8-p2.yaml  data=C:/Users/guilh/Documents/GitHub_clone/Yolov11/datasets/data.yaml  epochs=100 batch=16 device=0 optimizer=auto verbose=True^C

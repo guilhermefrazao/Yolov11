@@ -1,48 +1,37 @@
 import cv2
+import pybboxes as pbx
+import os
+
 from PIL import Image
 
-path = 'datasets/train_marcos/labels/marcos_0.txt'
-path_img = 'datasets/train_marcos/images/marcos_(1).jpeg'
+def draw_yolo(image, labels):
+    """ function to draw bounding box in the augmented image"""
+    H, W = image.shape[:2]
 
-image = Image.open(path_img)
+    for label in labels:
+        yolo_normalized = label[1:]
+        box_voc = pbx.convert_bbox(tuple(yolo_normalized), from_type="yolo", to_type="voc", image_size=(W, H))
+        cv2.rectangle(image, (box_voc[0], box_voc[1]),(box_voc[2], box_voc[3]), (0, 255, 0), 2)
+    
 
-img_width, img_height = image.size 
-print(img_width, img_height)
+if __name__ == "__main__":
+    #TODO fazer com que o código pegue automaticamente os valores no txt
+    bounding_box = [[0.0, 0.5375000238418579, 0.08125001192092896, 0.2250000238418579, 0.1625000238418579]]
+    image_path = 'datasets/augmentation/augmented_images/1_jpg.rf.6e8297a2a0b0174280aadf17cef2f1e5_augment.jpg'
+    output_folder = 'datasets/augmentation/labeled_images'
+    base_filename = os.path.splitext(os.path.basename(image_path))
 
-with open(path,'r') as file:
-    line = file.readlines()
+    image = Image.open(image_path)
+    image_rectangle = cv2.imread(image_path)
 
-label = line[0].split()
+    draw_yolo(image_rectangle, bounding_box)
 
-x_label = label[1]
-y_label = label[2]
-w_label = label[3]
-h_label = label[4]
+    output_path = os.path.join(output_folder, f"{base_filename}_labeled.jpg")
 
-class_id = label[0]
-x_center = float(label[1]) * img_width
-y_center = float(label[2]) * img_height
-box_width = float(label[3]) * img_width
-box_height = float(label[4]) * img_height
+    cv2.imwrite(output_path, image_rectangle)
 
-print(x_center, y_center, box_width, box_height)
-
-x_min = int(x_center - (box_width / 2))
-x_max = int(x_center + (box_width / 2))
-y_min = int(y_center - (box_height / 2))
-y_max = int(y_center + (box_height / 2))
-
-print(x_min, y_min, x_max, y_max)
+    cv2.imshow("Labeled_image", image_rectangle)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 
-img = cv2.imread(path_img)
-
-cv2.rectangle(img, (x_min, y_min), (x_max, y_max), (255,0,0), 2)
-
-#cv2.rectangle(img, (int(x_center), int(y_center)), (int(box_height), int(box_width)), (255,0,0), 2)
-
-#cv2.rectangle(img, (x_label, y_label), (w_label, h_label), (255,0,0), 2)
-
-cv2.imshow("Labeled_image", img)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
