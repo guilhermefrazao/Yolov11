@@ -1,47 +1,30 @@
 import keras
 import tensorflow as tf
 import os
+import matplotlib.pyplot as plt
+import pandas as pd
+
+from glob import glob
 from tensorflow import keras 
 from keras import layers
 from keras import preprocessing
-import matplotlib.pyplot as plt
+from rats.augmentation_labels import augmentation_labels
 
 
-def load_labels(labels_dir, image_filenames):
-    labels = []
-    for filename in image_filenames:
-        label_filename = os.path.join(labels_dir, filename.replace(".jpg", ".txt"))  # Supondo que os arquivos de rótulo tenham o mesmo nome
-        with open(label_filename, 'r') as f:
-            labels.append(int(f.read().strip()))  # Supondo que o label seja um número
-    return labels
 
-def save_images(batch, batch_idx, augmentation_dir):
-    for i, img in enumerate(batch):
-        # Converte o tensor para numpy array e remove a dimensão do batch
-        img_array = img.numpy().astype("uint8")
-        
-        # Usar o índice do batch e da imagem para nomear o arquivo
-        img_filename = f"{augmentation_dir}/augmented_image_{batch_idx}_{i}.png"
-        
-        # Salvar a imagem usando Matplotlib
-        plt.imsave(img_filename, img_array)
+def saving_files(preprocessed_ds, labels, augmentation_dir, labels_dir):
+        for batch_idx, (batch_images) in enumerate(preprocessed_ds):
 
-def save_labels(labels, batch_idx, labels_dir):
-    for i, label in enumerate(labels):
+            for i, (img, lbl) in enumerate(zip(batch_images)):
+                img_array = img.numpy().astype("uint8")
+                img_filename = os.path.join(augmentation_dir, f"augmented_image_{batch_idx}_{i}.png")
+                plt.imsave(img_filename, img_array)
 
-        label_array = labels.numpy().astype("float32")
-        
-        label_filename = f"{labels_dir}/augmented_image_{batch_idx}_{i}.txt"
+                label_filename = os.path.join(labels_dir, f"augmented_image_{batch_idx}_{i}.txt")
+                with open(label_filename, 'w') as file:
+                    file.write(' '.join(map(str, lbl.numpy())))
 
-        with open(label_filename, 'w') as file:
-            file.writelines(f"{label_array[0]} {label_array[1]} {label_array[2]} {label_array[3]} {label_array[4]}")
-
-def saving_files(preprocessed_ds,augmentation_dir,labels_dir):
-        for batch_idx, (batch_images, labels) in enumerate(preprocessed_ds):
-            save_images(batch_images, batch_idx, augmentation_dir)
-            save_labels(labels, batch_idx, labels_dir)
-
-def Augmentation():
+def Augmentation(augmentation_dir, labels_dir):
     ds = preprocessing.image_dataset_from_directory(
         directory="datasets/train", image_size=(640, 480), batch_size=32, verbose=True)
 
@@ -49,7 +32,7 @@ def Augmentation():
         layers.AutoContrast(),
         layers.RandomContrast(factor=0.5),
         layers.RandomBrightness(factor=0.3),
-        layers.RandomFlip(mode='horizontal'), # meaning, left-to-right
+        layers.RandomFlip(mode='horizontal'), 
     ])
 
     preprocessed_ds = ds.map(
@@ -57,17 +40,18 @@ def Augmentation():
         num_parallel_calls=tf.data.experimental.AUTOTUNE,
     )
 
-    augmentation_dir = "datasets/train/images"
-    labels_dir = "datasets/train/labels"
-
-    for images, labels in preprocessed_ds.take(1):  # 'take(1)' para ver apenas um batch
-        print("Labels das imagens augmentadas:", labels.numpy())
+    augmentation_labels()
 
     saving_files(preprocessed_ds, augmentation_dir, labels_dir)
 
     return True
 
-if Augmentation():
-    print("Augmentation done!")
-else:
-    print("Augmentation failed!")
+if __name__ == "__main__":
+    augmentation_dir = "datasets/train/augmented_images"
+    labels_dir = "datasets/train/augmented_labels"
+
+    if Augmentation(augmentation_dir, labels_dir):
+        print("Data augmentation concluída com sucesso!")
+    else:
+        print("Erro ao realizar data augmentation!")
+
