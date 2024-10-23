@@ -1,14 +1,23 @@
 import cv2
+from PIL import Image
 
-img_height = 480
-img_width = 640
-path = 'datasets/train/labels_augmentation/augmented_image_0_0.txt'
-path_img = 'datasets/train/images_augmentation/augmented_image_0_3.png'
+path = 'datasets/train_marcos/labels/marcos_0.txt'
+path_img = 'datasets/train_marcos/images/marcos_(1).jpeg'
+
+image = Image.open(path_img)
+
+img_width, img_height = image.size 
+print(img_width, img_height)
 
 with open(path,'r') as file:
     line = file.readlines()
 
 label = line[0].split()
+
+x_label = label[1]
+y_label = label[2]
+w_label = label[3]
+h_label = label[4]
 
 class_id = label[0]
 x_center = float(label[1]) * img_width
@@ -29,6 +38,10 @@ print(x_min, y_min, x_max, y_max)
 img = cv2.imread(path_img)
 
 cv2.rectangle(img, (x_min, y_min), (x_max, y_max), (255,0,0), 2)
+
+#cv2.rectangle(img, (int(x_center), int(y_center)), (int(box_height), int(box_width)), (255,0,0), 2)
+
+#cv2.rectangle(img, (x_label, y_label), (w_label, h_label), (255,0,0), 2)
 
 cv2.imshow("Labeled_image", img)
 cv2.waitKey(0)
