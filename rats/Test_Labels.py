@@ -16,10 +16,11 @@ def draw_yolo(image, labels):
 
 if __name__ == "__main__":
     #TODO fazer com que o código pegue automaticamente os valores no txt
-    with open('datasets/augmentation/augmented_images/1_jpg.rf.6e8297a2a0b0174280aadf17cef2f1e5_augment.txt', 'r') as file:
+    with open('datasets/augmentation/augmented_labels/5_jpg.rf.5d2e0409624802985641587e99f41d45_augment.txt', 'r') as file:
         file_data = file.readlines()
         bounding_box = [list(map(float, line.strip().split())) for line in file_data]
-    image_path = 'datasets/augmentation/augmented_images/1_jpg.rf.6e8297a2a0b0174280aadf17cef2f1e5_augment.jpg'
+
+    image_path = 'datasets/augmentation/augmented_images/5_jpg.rf.5d2e0409624802985641587e99f41d45_augment.jpg'
     output_folder = 'datasets/augmentation/labeled_images'
     base_filename = os.path.splitext(os.path.basename(image_path))
 

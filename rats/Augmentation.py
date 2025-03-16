@@ -99,8 +99,13 @@ if __name__ == "__main__":
 
     labels_dir = "datasets/train/labels"
     original_folder = 'datasets/train/images'
+
+    #lables_dir = 'datasets/train/labels_open_images'
+    #original_folder = 'datasets/train/images_open_images'
+    
     augmented_folder_images = 'datasets/augmentation/augmented_images'
     augmented_folder_txt = 'datasets/augmentation/augmented_labels'
+    images_amount = 0
 
     txt_list = glob(labels_dir + '/**/*.txt', recursive = True)
 
@@ -111,7 +116,10 @@ if __name__ == "__main__":
     images_names = [f for f in folder_organizado if f.endswith(('.jpg', '.jpeg', '.png'))]
 
     for image_name in images_names:
-
+        print("Processing the file : ",image_name , "\n")
+        images_amount += 1
+        print("images_amount:", images_amount)
+        
         image_path = os.path.join(original_folder, image_name)
         image = cv2.imread(image_path)
         base_filename = os.path.splitext(os.path.basename(image_path))[0]
